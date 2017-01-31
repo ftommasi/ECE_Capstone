@@ -1,4 +1,4 @@
-# ECE-Capstone-Demo
+# ECE Capstone Demo
 
 This is the working baseline for our Senior Design Project, webDAQ.
 
