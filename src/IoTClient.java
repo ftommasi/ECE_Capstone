@@ -1,9 +1,14 @@
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Scanner;
+
 import com.amazonaws.services.iot.client.AWSIotException;
 import com.amazonaws.services.iot.client.AWSIotMessage;
 import com.amazonaws.services.iot.client.AWSIotMqttClient;
 import com.amazonaws.services.iot.client.AWSIotQos;
 import com.amazonaws.services.iot.client.AWSIotTopic;
-import com.amazonaws.services.iot.client.sample.sampleUtil.CommandArguments;
 import com.amazonaws.services.iot.client.sample.sampleUtil.SampleUtil;
 import com.amazonaws.services.iot.client.sample.sampleUtil.SampleUtil.KeyStorePasswordPair;
 
@@ -12,9 +17,8 @@ public class IoTClient {
 	private static AWSIotMqttClient awsIotClient;
 	private static final AWSIotQos TestTopicQos = AWSIotQos.QOS1;
 	
-	public IoTClient(String[] args) throws AWSIotException {
-        CommandArguments arguments = CommandArguments.parse(args);
-        initClient(arguments);
+	public IoTClient(String filename) throws AWSIotException {
+        initClient(filename);
         awsIotClient.connect();
 	}
 	
@@ -65,32 +69,41 @@ public class IoTClient {
         }
     }
 	
-    public void initClient(CommandArguments arguments) {
-        String clientEndpoint = arguments.getNotNull("clientEndpoint", SampleUtil.getConfig("clientEndpoint"));
-        String clientId = arguments.getNotNull("clientId", SampleUtil.getConfig("clientId"));
+    public void initClient(String filename) {
+    	
+    	File config = new File(filename);
+    	Map<String, String> configMap = new HashMap<String, String>();
+    	
+    	Scanner sc = null;
+		try {
+			sc = new Scanner(config);
+			
+	    	while (sc.hasNextLine()) {
+	    		String line = sc.nextLine();
+	    		String[] fields = line.split("\\s+");
 
-        String certificateFile = arguments.get("certificateFile", SampleUtil.getConfig("certificateFile"));
-        String privateKeyFile = arguments.get("privateKeyFile", SampleUtil.getConfig("privateKeyFile"));
-        if (awsIotClient == null && certificateFile != null && privateKeyFile != null) {
-            String algorithm = arguments.get("keyAlgorithm", SampleUtil.getConfig("keyAlgorithm"));
-            KeyStorePasswordPair pair = SampleUtil.getKeyStorePasswordPair(certificateFile, privateKeyFile, algorithm);
-
+	    		if (fields.length != 2) {
+	    			throw new IllegalArgumentException("invalid format for config file");
+	    		}
+	    		
+	    		configMap.put(fields[0], fields[1]);
+	    	}	    	
+		} catch (FileNotFoundException e) {
+			throw new IllegalArgumentException("bad filename for config file");
+		} finally {
+			sc.close();
+		}
+    	
+        String clientEndpoint = configMap.get("clientEndpoint");
+        String clientId = configMap.get("clientId");
+        String certificateFile = configMap.get("certificateFile");
+        String privateKeyFile = configMap.get("privateKeyFile");
+                
+        if (clientEndpoint != null && clientId != null && certificateFile != null && privateKeyFile != null) {
+        	KeyStorePasswordPair pair = SampleUtil.getKeyStorePasswordPair(certificateFile, privateKeyFile);
             awsIotClient = new AWSIotMqttClient(clientEndpoint, clientId, pair.keyStore, pair.keyPassword);
-        }
-
-        if (awsIotClient == null) {
-            String awsAccessKeyId = arguments.get("awsAccessKeyId", SampleUtil.getConfig("awsAccessKeyId"));
-            String awsSecretAccessKey = arguments.get("awsSecretAccessKey", SampleUtil.getConfig("awsSecretAccessKey"));
-            String sessionToken = arguments.get("sessionToken", SampleUtil.getConfig("sessionToken"));
-
-            if (awsAccessKeyId != null && awsSecretAccessKey != null) {
-                awsIotClient = new AWSIotMqttClient(clientEndpoint, clientId, awsAccessKeyId, awsSecretAccessKey,
-                        sessionToken);
-            }
-        }
-
-        if (awsIotClient == null) {
-            throw new IllegalArgumentException("Failed to construct client due to missing certificate or credentials.");
+        } else {
+        	throw new IllegalArgumentException("Failed to construct client due to missing arguments");
         }
     }
 }
