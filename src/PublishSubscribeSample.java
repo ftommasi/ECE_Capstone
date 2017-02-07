@@ -26,7 +26,7 @@ public class PublishSubscribeSample {
 
     public static void main(String args[]) throws InterruptedException, AWSIotException, AWSIotTimeoutException {
 
-    	IoTClient client = new IoTClient("Certificate1/daq.conf");
+    	IoTClient client = new IoTClient("Certificate2/conf.txt");
     	
         client.subscribe("test");
         client.publish("test");
