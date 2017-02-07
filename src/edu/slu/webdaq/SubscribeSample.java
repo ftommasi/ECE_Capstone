@@ -1,3 +1,4 @@
+package edu.slu.webdaq;
 import com.amazonaws.services.iot.client.AWSIotException;
 import com.amazonaws.services.iot.client.AWSIotTimeoutException;
 

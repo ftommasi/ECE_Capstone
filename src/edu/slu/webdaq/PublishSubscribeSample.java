@@ -1,3 +1,4 @@
+package edu.slu.webdaq;
 /*
  * Copyright 2016 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
@@ -26,7 +27,7 @@ public class PublishSubscribeSample {
 
     public static void main(String args[]) throws InterruptedException, AWSIotException, AWSIotTimeoutException {
 
-    	IoTClient client = new IoTClient("Certificate2/conf.txt");
+    	IoTClient client = new IoTClient("Certificate1/conf.txt");
     	
         client.subscribe("test");
         client.publish("test");
