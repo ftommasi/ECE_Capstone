@@ -5,7 +5,7 @@ class SubscribeSample {
     
 	public static void main(String args[]) throws InterruptedException, AWSIotException, AWSIotTimeoutException {
     	
-		IoTClient client = new IoTClient(args);
+		IoTClient client = new IoTClient("Certificate1/conf.txt");
     	
         client.subscribe("test");
     }
