@@ -15,18 +15,24 @@ int main(){
   clock_t start,end;
   FILE* sample_file;
   sample_file = fopen("SAMPLE-SESSION","a+");
-
-  while(1){
+  int count = 0;
+  while(count < 100000){
     start = clock();
     snprintf(buf,sizeof(buf),ADC_file);
     end = clock();
     int fd = open(buf,0);
     int buflen;
     int sample_count = 0;
-   
+    count++;
     while((buflen=read(fd,buf,100))>0){
-      write(1,buf,buflen);
-      write(fileno(sample_file),buf,buflen);
+      //write(1,buf,buflen);
+      char tempbuf[5];
+      memcpy(tempbuf,&buf[0],4);
+      tempbuf[4] ='\0';
+      //printf("buf[42]: %s\n",tempbuf);
+      fprintf(sample_file,"%s\n",tempbuf);
+      //fprintf(sample_file,"%d\n",count);
+      //write(fileno(sample_file),count_buf,sizeof(count_buf));
       int in_volts = atoi(buf);
      // snprintf();
      // fprintf(sample_file,buf);
@@ -37,7 +43,8 @@ int main(){
       sample_count++;
       //printf("%f V\n");
     }
-    printf("\n---TIME: %f---\n",(double)(end-start)/CLOCKS_PER_SEC);
+  //  printf("\n---TIME: %f---\n",(double)(end-start)/CLOCKS_PER_SEC);
   }
+  fclose(sample_file);
   return 0;
 }
