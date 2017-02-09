@@ -1,5 +1,5 @@
+package client;
 import com.amazonaws.services.iot.client.AWSIotException;
-import com.amazonaws.services.iot.client.AWSIotMessage;
 import com.amazonaws.services.iot.client.AWSIotMqttClient;
 import com.amazonaws.services.iot.client.AWSIotQos;
 import com.amazonaws.services.iot.client.AWSIotTopic;
@@ -18,52 +18,11 @@ public class IoTClient {
         awsIotClient.connect();
 	}
 	
-	public Thread publish(String testTopic) throws InterruptedException {
-        Thread nonBlockingPublishThread = new Thread(new NonBlockingPublisher(awsIotClient, testTopic));
-
-        nonBlockingPublishThread.start();
-        
-        return nonBlockingPublishThread;
-	}
-	
 	public void subscribe(String testTopic) throws AWSIotException {
-		AWSIotTopic topic = new TestTopicListener(testTopic, TestTopicQos);
+		AWSIotTopic topic = new StrandListener(testTopic, TestTopicQos);
 	    awsIotClient.subscribe(topic, true);
 	}
 	
-    public static class NonBlockingPublisher implements Runnable {
-        private final AWSIotMqttClient awsIotClient;
-        private String sampleTopic;
-
-        public NonBlockingPublisher(AWSIotMqttClient awsIotClient, String sampleTopic) {
-            this.awsIotClient = awsIotClient;
-            this.sampleTopic = sampleTopic;
-        }
- 
-        @Override
-        public void run() {
-        	
-        	String sessionID = "demo";
-
-            while (true) {
-            	long millis = System.currentTimeMillis();
-                String payload = "{\"time\": " + millis + ",\"session\": " + "\"" + sessionID + "\"" + ",\"value\": " + Math.sin((double) millis / 1000) + "}";
-                AWSIotMessage message = new NonBlockingPublishListener(sampleTopic, TestTopicQos, payload);
-                try {
-                    awsIotClient.publish(message);
-                } catch (AWSIotException e) {
-                    System.out.println(System.currentTimeMillis() + ": publish failed for " + payload);
-                }
-
-                try {
-                    Thread.sleep(1000);
-                } catch (InterruptedException e) {
-                    System.out.println(System.currentTimeMillis() + ": NonBlockingPublisher was interrupted");
-                    return;
-                }
-            }
-        }
-    }
 	
     public void initClient(CommandArguments arguments) {
         String clientEndpoint = arguments.getNotNull("clientEndpoint", SampleUtil.getConfig("clientEndpoint"));

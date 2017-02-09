@@ -1,0 +1,14 @@
+package client;
+
+import com.amazonaws.services.iot.client.AWSIotException;
+import com.amazonaws.services.iot.client.AWSIotTimeoutException;
+
+class Strand {
+    
+	public static void main(String args[]) throws InterruptedException, AWSIotException, AWSIotTimeoutException {
+    	
+		IoTClient client = new IoTClient(args);
+    	
+        client.subscribe("test");
+    }
+}
