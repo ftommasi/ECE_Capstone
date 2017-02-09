@@ -1,4 +1,4 @@
-package edu.slu.webdaq;
+package edu.slu.iot;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.HashMap;
@@ -6,69 +6,31 @@ import java.util.Map;
 import java.util.Scanner;
 
 import com.amazonaws.services.iot.client.AWSIotException;
-import com.amazonaws.services.iot.client.AWSIotMessage;
 import com.amazonaws.services.iot.client.AWSIotMqttClient;
-import com.amazonaws.services.iot.client.AWSIotQos;
 import com.amazonaws.services.iot.client.AWSIotTopic;
 import com.amazonaws.services.iot.client.sample.sampleUtil.SampleUtil;
 import com.amazonaws.services.iot.client.sample.sampleUtil.SampleUtil.KeyStorePasswordPair;
 
 public class IoTClient {
 	
-	private static AWSIotMqttClient awsIotClient;
-	private static final AWSIotQos TestTopicQos = AWSIotQos.QOS1;
+	public static AWSIotMqttClient awsIotClient;
 	
 	public IoTClient(String filename) throws AWSIotException {
         initClient(filename);
         awsIotClient.connect();
 	}
 	
-	public Thread publish(String testTopic) throws InterruptedException {
-        Thread nonBlockingPublishThread = new Thread(new NonBlockingPublisher(awsIotClient, testTopic));
+	public Thread publish(Publisher publisher) throws InterruptedException {
+        Thread nonBlockingPublishThread = new Thread(publisher);
 
         nonBlockingPublishThread.start();
         
         return nonBlockingPublishThread;
 	}
 	
-	public void subscribe(String testTopic) throws AWSIotException {
-		AWSIotTopic topic = new TestTopicListener(testTopic, TestTopicQos);
+	public void subscribe(AWSIotTopic topic) throws AWSIotException {
 	    awsIotClient.subscribe(topic, true);
 	}
-	
-    public static class NonBlockingPublisher implements Runnable {
-        private final AWSIotMqttClient awsIotClient;
-        private String testTopic;
-
-        public NonBlockingPublisher(AWSIotMqttClient awsIotClient, String testTopic) {
-            this.awsIotClient = awsIotClient;
-            this.testTopic = testTopic;
-        }
-
-        @Override
-        public void run() {
-        	
-        	String sessionID = "demo";
-
-            while (true) {
-            	long millis = System.currentTimeMillis();
-                String payload = "{\"time\": " + millis + ",\"session\": " + "\"" + sessionID + "\"" + ",\"value\": " + Math.sin((double) millis / 1000) + "}";
-                AWSIotMessage message = new NonBlockingPublishListener(testTopic, TestTopicQos, payload);
-                try {
-                    awsIotClient.publish(message);
-                } catch (AWSIotException e) {
-                    System.out.println(System.currentTimeMillis() + ": publish failed for " + payload);
-                }
-
-                try {
-                    Thread.sleep(1000);
-                } catch (InterruptedException e) {
-                    System.out.println(System.currentTimeMillis() + ": NonBlockingPublisher was interrupted");
-                    return;
-                }
-            }
-        }
-    }
 	
     public void initClient(String filename) {
     	
