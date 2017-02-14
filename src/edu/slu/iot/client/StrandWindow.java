@@ -1,4 +1,4 @@
-package client;
+package edu.slu.iot.client;
 
 import java.awt.EventQueue;
 

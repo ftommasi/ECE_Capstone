@@ -1,4 +1,4 @@
-package edu.slu.webdaq;
+package edu.slu.iot.mockdaq;
 import com.amazonaws.services.iot.client.AWSIotException;
 import com.amazonaws.services.iot.client.AWSIotTimeoutException;
 

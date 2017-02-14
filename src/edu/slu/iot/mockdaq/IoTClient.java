@@ -1,4 +1,4 @@
-package edu.slu.webdaq;
+package edu.slu.iot.mockdaq;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.HashMap;
