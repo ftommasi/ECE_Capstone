@@ -9,6 +9,7 @@ import javax.swing.JButton;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
+import edu.slu.iot.client.Strand;
 
 import javax.swing.JFileChooser;
 import javax.swing.JTextField;
@@ -17,11 +18,16 @@ import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
+
+import com.amazonaws.services.iot.client.AWSIotException;
+import com.amazonaws.services.iot.client.AWSIotTimeoutException;
+
 import javax.swing.JScrollPane;
 import java.awt.SystemColor;
 
 public class StrandWindow {
 
+	private Strand currentStrand;
 	private JFrame frame;
 	private JTextField topicField;
 	private JTable table;
@@ -76,6 +82,8 @@ public class StrandWindow {
 			@Override
 			public void mouseClicked(MouseEvent arg0) {
 				JFileChooser configFileChooser = new JFileChooser();
+				File workingDirectory = new File(System.getProperty("user.dir"));
+				configFileChooser.setCurrentDirectory(workingDirectory);
 				frame.getContentPane().add(configFileChooser);
 				int chooseStatus = configFileChooser.showOpenDialog(frame);
 				if (chooseStatus == JFileChooser.APPROVE_OPTION) {
@@ -92,7 +100,11 @@ public class StrandWindow {
 		JButton btnNewButton = new JButton("Connect to topic");
 		btnNewButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				
+					try {
+						currentStrand =  new Strand(topicField.getText(), configFile);
+					} catch (InterruptedException | AWSIotException | AWSIotTimeoutException e) {
+						e.printStackTrace();
+					}
 			}
 		});
 		frame.getContentPane().add(btnNewButton, "cell 2 0,alignx center,growy");
