@@ -4,7 +4,7 @@
   <artifactId>mock-daq</artifactId>
   <version>0.0</version>
   <build>
-    <sourceDirectory>src</sourceDirectory>
+    <sourceDirectory>src/main/java</sourceDirectory>
     <plugins>
       <plugin>
         <artifactId>maven-compiler-plugin</artifactId>
@@ -55,6 +55,12 @@
       <groupId>com.amazonaws</groupId>
       <artifactId>aws-iot-device-sdk-java-samples</artifactId>
       <version>1.0.1</version>
+    </dependency>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>4.11</version>
+      <scope>test</scope>
     </dependency>
   </dependencies>
 </project>
