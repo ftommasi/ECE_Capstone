@@ -40,7 +40,7 @@ public class IoTClient {
     	Scanner sc = null;
 		try {
 			sc = new Scanner(config);
-			
+
 	    	while (sc.hasNextLine()) {
 	    		String line = sc.nextLine();
 	    		String[] fields = line.split("\\s+");
