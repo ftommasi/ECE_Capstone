@@ -15,8 +15,13 @@ package edu.slu.iot.mockdaq;
  */
 
 import com.amazonaws.services.iot.client.AWSIotMqttClient;
+import com.amazonaws.services.iot.client.AWSIotQos;
 import com.amazonaws.services.iot.client.AWSIotException;
 import com.amazonaws.services.iot.client.AWSIotTimeoutException;
+
+import edu.slu.iot.IoTClient;
+import edu.slu.iot.mockdaq.TestPublisher;
+import edu.slu.iot.mockdaq.TestTopicListener;
 
 /**
  * This is an example that uses {@link AWSIotMqttClient} to subscribe to a topic and
@@ -29,7 +34,7 @@ public class PublishSubscribeSample {
 
     	IoTClient client = new IoTClient("Certificate1/conf.txt");
     	
-        client.subscribe("test");
-        client.publish("test");
+        client.subscribe(new TestTopicListener("test", AWSIotQos.QOS1));
+        client.publish(new TestPublisher("test", AWSIotQos.QOS1, "demo"));
     }
 }
