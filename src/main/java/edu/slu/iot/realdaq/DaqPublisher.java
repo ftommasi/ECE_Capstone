@@ -33,7 +33,12 @@ public class DaqPublisher extends Publisher {
           String payload = "{\"time\": " + millis + ",\"session\": " + "\"" + sessionID + "\"" + ",\"value\": " + value + "}";
 
           AWSIotMessage message = new NonBlockingPublishListener(topic, qos, payload);
-
+          try{
+            Thread.sleep(50);
+          }
+          catch(InterruptedException e){
+            // DO NOTHING 
+          }
           publish(message);
         }
       }
@@ -60,8 +65,9 @@ public class DaqPublisher extends Publisher {
     }
 
     @Override
-    public void onFailure() {
+      public void onFailure(){
       System.out.println(System.currentTimeMillis() + ": publish failed for " + getStringPayload());
+      throw new RuntimeException(); 
     }
 
     @Override
