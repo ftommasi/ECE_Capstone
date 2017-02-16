@@ -23,8 +23,9 @@ public class DaqPublisher extends Publisher {
 
 
     File file = new File("/home/debian/ECE_Capstone_Networking/src/main/c/ECE_Capstone_ADC/SAMPLE-SESSION");
-    try{
-      Scanner sc = new Scanner(file);
+    try (
+    		Scanner sc = new Scanner(file);
+    ) {
       while(true){
         if(sc.hasNextLine()){
           long millis = System.currentTimeMillis();
@@ -36,7 +37,6 @@ public class DaqPublisher extends Publisher {
           publish(message);
         }
       }
-      //sc.close();
     }
 
     catch(FileNotFoundException e){
