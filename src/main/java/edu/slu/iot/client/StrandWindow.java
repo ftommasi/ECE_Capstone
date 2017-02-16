@@ -24,13 +24,14 @@ import com.amazonaws.services.iot.client.AWSIotTimeoutException;
 
 import javax.swing.JScrollPane;
 import java.awt.SystemColor;
+import javax.swing.JList;
+import javax.swing.AbstractListModel;
 
 public class StrandWindow {
 
 	private Strand currentStrand;
 	private JFrame frame;
 	private JTextField topicField;
-	private JTable table;
 	private File configFile = null;
 
 	/**
@@ -70,7 +71,7 @@ public class StrandWindow {
 		frame = new JFrame();
 		frame.setBounds(100, 100, 525, 300);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.getContentPane().setLayout(new MigLayout("", "[157.00px,grow][91px][][grow]", "[70.00px][126.00px,grow][grow]"));
+		frame.getContentPane().setLayout(new MigLayout("", "[157.00px,grow][91px][][grow]", "[25.00px][17.00px,grow][grow]"));
 		
 		JTextPane txtpnChooseAConfiguration = new JTextPane();
 		txtpnChooseAConfiguration.setBackground(SystemColor.control);
@@ -110,7 +111,7 @@ public class StrandWindow {
 		frame.getContentPane().add(btnNewButton, "cell 2 0,alignx center,growy");
 		
 		JButton btnStream = new JButton("Stream");
-		frame.getContentPane().add(btnStream, "cell 3 0 1 2,alignx right,growy");
+		frame.getContentPane().add(btnStream, "cell 3 0 1 2,alignx center,aligny top");
 		
 		JTextPane txtpnEnterTheTopic = new JTextPane();
 		txtpnEnterTheTopic.setBackground(SystemColor.control);
@@ -124,39 +125,19 @@ public class StrandWindow {
 		frame.getContentPane().add(txtpnStatusNotConnected, "cell 2 1,alignx center,aligny top");
 		
 		JScrollPane scrollPane = new JScrollPane();
-		frame.getContentPane().add(scrollPane, "flowy,cell 0 2 4 1,growx");
+		frame.getContentPane().add(scrollPane, "cell 0 2 4 1,grow");
 		
-		table = new JTable();
-		scrollPane.setViewportView(table);
-		table.setModel(new DefaultTableModel(
-			new Object[][] {
-				{null, null, null, null, null},
-				{null, null, null, null, null},
-				{null, null, null, null, null},
-				{null, null, null, null, null},
-				{null, null, null, null, null},
-				{null, null, null, null, null},
-				{null, null, null, null, null},
-				{null, null, null, null, null},
-				{null, null, null, null, null},
-				{null, null, null, null, null},
-				{null, null, null, null, null},
-				{null, null, null, null, null},
-				{null, null, null, null, null},
-				{null, null, null, null, null},
-				{null, null, null, null, null},
-				{null, null, null, null, null},
-				{null, null, null, null, null},
-				{null, null, null, null, null},
-				{null, null, null, null, null},
-				{null, null, null, null, null},
-			},
-			new String[] {
-				"New column", "New column", "New column", "New column", "New column"
+		JList list = new JList();
+		list.setModel(new AbstractListModel() {
+			String[] values = new String[] {"Device ID, Session ID, Time Stamp, Voltage", "Device ID, Session ID, Time Stamp, Voltage", "Device ID, Session ID, Time Stamp, Voltage", "Device ID, Session ID, Time Stamp, Voltage", "Device ID, Session ID, Time Stamp, Voltage", "Device ID, Session ID, Time Stamp, Voltage", "Device ID, Session ID, Time Stamp, Voltage", "Device ID, Session ID, Time Stamp, Voltage", "Device ID, Session ID, Time Stamp, Voltage", "Device ID, Session ID, Time Stamp, Voltage", "Device ID, Session ID, Time Stamp, Voltage", "Device ID, Session ID, Time Stamp, Voltage", "Device ID, Session ID, Time Stamp, Voltage", "Device ID, Session ID, Time Stamp, Voltage", "Device ID, Session ID, Time Stamp, Voltage", "Device ID, Session ID, Time Stamp, Voltage", "Device ID, Session ID, Time Stamp, Voltage", "Device ID, Session ID, Time Stamp, Voltage", "Device ID, Session ID, Time Stamp, Voltage", "Device ID, Session ID, Time Stamp, Voltage", "Device ID, Session ID, Time Stamp, Voltage", "Device ID, Session ID, Time Stamp, Voltage", "Device ID, Session ID, Time Stamp, Voltage", "Device ID, Session ID, Time Stamp, Voltage", "Device ID, Session ID, Time Stamp, Voltage", "Device ID, Session ID, Time Stamp, Voltage", "Device ID, Session ID, Time Stamp, Voltage", "Device ID, Session ID, Time Stamp, Voltage", "Device ID, Session ID, Time Stamp, Voltage", "Device ID, Session ID, Time Stamp, Voltage", "Device ID, Session ID, Time Stamp, Voltage", "Device ID, Session ID, Time Stamp, Voltage", "Device ID, Session ID, Time Stamp, Voltage", "Device ID, Session ID, Time Stamp, Voltage", "Device ID, Session ID, Time Stamp, Voltage", "Device ID, Session ID, Time Stamp, Voltage", "Device ID, Session ID, Time Stamp, Voltage", "Device ID, Session ID, Time Stamp, Voltage", "Device ID, Session ID, Time Stamp, Voltage", "Device ID, Session ID, Time Stamp, Voltage", "Device ID, Session ID, Time Stamp, Voltage", "Device ID, Session ID, Time Stamp, Voltage", "Device ID, Session ID, Time Stamp, Voltage", "Device ID, Session ID, Time Stamp, Voltage", "Device ID, Session ID, Time Stamp, Voltage", "Device ID, Session ID, Time Stamp, Voltage", "Device ID, Session ID, Time Stamp, Voltage", "Device ID, Session ID, Time Stamp, Voltage", "Device ID, Session ID, Time Stamp, Voltage", "Device ID, Session ID, Time Stamp, Voltage", "Device ID, Session ID, Time Stamp, Voltage", "Device ID, Session ID, Time Stamp, Voltage", "Device ID, Session ID, Time Stamp, Voltage", "Device ID, Session ID, Time Stamp, Voltage", "Device ID, Session ID, Time Stamp, Voltage"};
+			public int getSize() {
+				return values.length;
 			}
-		));
-		table.setColumnSelectionAllowed(true);
-		table.setCellSelectionEnabled(true);
+			public Object getElementAt(int index) {
+				return values[index];
+			}
+		});
+		scrollPane.setViewportView(list);
 		
 	}
 }
