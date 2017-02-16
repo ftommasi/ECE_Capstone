@@ -2,6 +2,7 @@ package edu.slu.iot.realdaq;
 
 import com.amazonaws.services.iot.client.AWSIotMessage;
 import com.amazonaws.services.iot.client.AWSIotQos;
+import com.google.gson.Gson;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -12,6 +13,8 @@ import edu.slu.iot.Publisher;
 public class DaqPublisher extends Publisher {
 
   private String sessionID;
+  private String deviceID = "defaultDeviceID";
+  private static final Gson gson = new Gson();
 
   public DaqPublisher(String topic, AWSIotQos qos, String sessionID) {
     super(topic, qos);
@@ -28,17 +31,24 @@ public class DaqPublisher extends Publisher {
     ) {
       while(true){
         if(sc.hasNextLine()){
-          long millis = System.currentTimeMillis();
           String value = sc.nextLine();
-          String payload = "{\"time\": " + millis + ",\"session\": " + "\"" + sessionID + "\"" + ",\"value\": " + value + "}";
 
-          AWSIotMessage message = new NonBlockingPublishListener(topic, qos, payload);
+          String[] params = value.split(" ");
+          
+          float parsedValue = ((float)Integer.parseInt(params[0])*1.8f)/(float)4096;
+          long millis = Long.parseLong(params[1]); 
+          
           try{
             Thread.sleep(50);
           }
           catch(InterruptedException e){
             // DO NOTHING 
           }
+          
+          Sample s = new Sample(deviceID, sessionID, millis, parsedValue);
+          String jsonSample = gson.toJson(s);
+          AWSIotMessage message = new NonBlockingPublishListener(topic, qos, jsonSample);
+
           publish(message);
         }
       }
@@ -54,25 +64,27 @@ public class DaqPublisher extends Publisher {
   }
 
   private class NonBlockingPublishListener extends AWSIotMessage {
+	  
+	Sample sample;
 
     public NonBlockingPublishListener(String topic, AWSIotQos qos, String payload) {
       super(topic, qos, payload);
+      sample = gson.fromJson(getStringPayload(), Sample.class);
     }
 
     @Override
     public void onSuccess() {
-      System.out.println(System.currentTimeMillis() + ": >>> " + getStringPayload());
+      System.out.println(System.currentTimeMillis() + ": >>> " + sample);
     }
 
     @Override
-      public void onFailure(){
-      System.out.println(System.currentTimeMillis() + ": publish failed for " + getStringPayload());
-      throw new RuntimeException(); 
+    public void onFailure() {
+      System.out.println(System.currentTimeMillis() + ": publish failed for " + sample);
     }
 
     @Override
     public void onTimeout() {
-      System.out.println(System.currentTimeMillis() + ": publish timeout for " + getStringPayload());
+      System.out.println(System.currentTimeMillis() + ": publish timeout for " + sample);
     }
 
   }
