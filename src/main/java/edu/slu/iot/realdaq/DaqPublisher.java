@@ -31,10 +31,19 @@ public class DaqPublisher extends Publisher {
     ) {
       while(true){
         if(sc.hasNextLine()){
-          long millis = System.currentTimeMillis();
-          
           String value = sc.nextLine();
-          float parsedValue = Float.parseFloat(value);
+
+          String[] params = value.split(" ");
+          
+          float parsedValue = ((float)Integer.parseInt(params[0])*1.8f)/(float)4096;
+          long millis = Long.parseLong(params[1]); 
+          
+          try{
+            Thread.sleep(50);
+          }
+          catch(InterruptedException e){
+            // DO NOTHING 
+          }
           
           Sample s = new Sample(deviceID, sessionID, millis, parsedValue);
           String jsonSample = gson.toJson(s);
