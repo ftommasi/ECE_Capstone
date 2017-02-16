@@ -33,4 +33,8 @@ public class Sample implements Comparable<Sample> {
 		return ((Long) timestamp).compareTo(o.timestamp);
 	}
 
+	@Override
+	public String toString() {
+		return "deviceID: " + deviceID + ", sessionID: " + sessionID + ", timestamp: " + timestamp + " value: " + value;
+	}
 }
