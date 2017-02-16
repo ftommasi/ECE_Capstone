@@ -10,7 +10,7 @@ public class PublishSample {
 	
 	public static void main(String args[]) throws InterruptedException, AWSIotException, AWSIotTimeoutException {
     	
-		IoTClient client = new IoTClient("Certificate1/conf.txt");
+		IoTClient client = new IoTClient("Certificate2/conf.txt");
     	
 		client.publish(new TestPublisher("test", AWSIotQos.QOS1, "demo"));
 

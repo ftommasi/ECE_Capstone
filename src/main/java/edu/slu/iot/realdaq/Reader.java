@@ -1,3 +1,5 @@
+package edu.slu.iot.realdaq;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.Scanner;
