@@ -9,6 +9,10 @@ import javax.swing.JButton;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+
+import edu.slu.iot.IoTClient;
 import edu.slu.iot.client.Strand;
 
 import javax.swing.JFileChooser;
@@ -20,6 +24,7 @@ import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
 
 import com.amazonaws.services.iot.client.AWSIotException;
+import com.amazonaws.services.iot.client.AWSIotQos;
 import com.amazonaws.services.iot.client.AWSIotTimeoutException;
 
 import javax.swing.JScrollPane;
@@ -33,6 +38,9 @@ public class StrandWindow {
 	private JFrame frame;
 	private JTextField topicField;
 	private File configFile = null;
+	private IoTClient iotClient;
+	private JButton connectButton;
+	private AppendableView listModel = new AppendableView();
 
 	/**
 	 * Launch the application.
@@ -50,6 +58,7 @@ public class StrandWindow {
 				try {
 					StrandWindow window = new StrandWindow();
 					window.frame.setVisible(true);
+					window.connectionListener();
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -98,17 +107,9 @@ public class StrandWindow {
 		frame.getContentPane().add(topicField, "cell 1 1,alignx center,aligny top");
 		topicField.setColumns(10);
 		
-		JButton btnNewButton = new JButton("Connect to topic");
-		btnNewButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-					try {
-						currentStrand =  new Strand(topicField.getText(), configFile);
-					} catch (InterruptedException | AWSIotException | AWSIotTimeoutException e) {
-						e.printStackTrace();
-					}
-			}
-		});
-		frame.getContentPane().add(btnNewButton, "cell 2 0,alignx center,growy");
+		connectButton = new JButton("Connect to topic");
+		
+		frame.getContentPane().add(connectButton, "cell 2 0,alignx center,growy");
 		
 		JButton btnStream = new JButton("Stream");
 		frame.getContentPane().add(btnStream, "cell 3 0 1 2,alignx center,aligny top");
@@ -127,17 +128,49 @@ public class StrandWindow {
 		JScrollPane scrollPane = new JScrollPane();
 		frame.getContentPane().add(scrollPane, "cell 0 2 4 1,grow");
 		
-		JList list = new JList();
-		list.setModel(new AbstractListModel() {
-			String[] values = new String[] {"Device ID, Session ID, Time Stamp, Voltage", "Device ID, Session ID, Time Stamp, Voltage", "Device ID, Session ID, Time Stamp, Voltage", "Device ID, Session ID, Time Stamp, Voltage", "Device ID, Session ID, Time Stamp, Voltage", "Device ID, Session ID, Time Stamp, Voltage", "Device ID, Session ID, Time Stamp, Voltage", "Device ID, Session ID, Time Stamp, Voltage", "Device ID, Session ID, Time Stamp, Voltage", "Device ID, Session ID, Time Stamp, Voltage", "Device ID, Session ID, Time Stamp, Voltage", "Device ID, Session ID, Time Stamp, Voltage", "Device ID, Session ID, Time Stamp, Voltage", "Device ID, Session ID, Time Stamp, Voltage", "Device ID, Session ID, Time Stamp, Voltage", "Device ID, Session ID, Time Stamp, Voltage", "Device ID, Session ID, Time Stamp, Voltage", "Device ID, Session ID, Time Stamp, Voltage", "Device ID, Session ID, Time Stamp, Voltage", "Device ID, Session ID, Time Stamp, Voltage", "Device ID, Session ID, Time Stamp, Voltage", "Device ID, Session ID, Time Stamp, Voltage", "Device ID, Session ID, Time Stamp, Voltage", "Device ID, Session ID, Time Stamp, Voltage", "Device ID, Session ID, Time Stamp, Voltage", "Device ID, Session ID, Time Stamp, Voltage", "Device ID, Session ID, Time Stamp, Voltage", "Device ID, Session ID, Time Stamp, Voltage", "Device ID, Session ID, Time Stamp, Voltage", "Device ID, Session ID, Time Stamp, Voltage", "Device ID, Session ID, Time Stamp, Voltage", "Device ID, Session ID, Time Stamp, Voltage", "Device ID, Session ID, Time Stamp, Voltage", "Device ID, Session ID, Time Stamp, Voltage", "Device ID, Session ID, Time Stamp, Voltage", "Device ID, Session ID, Time Stamp, Voltage", "Device ID, Session ID, Time Stamp, Voltage", "Device ID, Session ID, Time Stamp, Voltage", "Device ID, Session ID, Time Stamp, Voltage", "Device ID, Session ID, Time Stamp, Voltage", "Device ID, Session ID, Time Stamp, Voltage", "Device ID, Session ID, Time Stamp, Voltage", "Device ID, Session ID, Time Stamp, Voltage", "Device ID, Session ID, Time Stamp, Voltage", "Device ID, Session ID, Time Stamp, Voltage", "Device ID, Session ID, Time Stamp, Voltage", "Device ID, Session ID, Time Stamp, Voltage", "Device ID, Session ID, Time Stamp, Voltage", "Device ID, Session ID, Time Stamp, Voltage", "Device ID, Session ID, Time Stamp, Voltage", "Device ID, Session ID, Time Stamp, Voltage", "Device ID, Session ID, Time Stamp, Voltage", "Device ID, Session ID, Time Stamp, Voltage", "Device ID, Session ID, Time Stamp, Voltage", "Device ID, Session ID, Time Stamp, Voltage"};
-			public int getSize() {
-				return values.length;
-			}
-			public Object getElementAt(int index) {
-				return values[index];
-			}
-		});
+		JList list = new JList(listModel);
 		scrollPane.setViewportView(list);
 		
 	}
+	
+	public void connectionListener() {
+		connectButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+					try {
+						//currentStrand =  new Strand(topicField.getText(), configFile);
+						iotClient = new IoTClient(configFile.getPath());
+				        iotClient.subscribe(new StrandListener(topicField.getText(), AWSIotQos.QOS1, StrandWindow.this));
+					} catch (AWSIotException e) {
+						e.printStackTrace();
+					}
+			}
+		});
+	}
+	
+	public void writeLineToList(String lineToWrite) {
+		listModel.addToList(lineToWrite);
+		
+	}
+	
+	public class AppendableView extends AbstractListModel<String> {
+		private List<String> model;
+		
+		public AppendableView() {
+			model = new ArrayList<String>();
+		}
+		
+		public int getSize() {
+			return model.size();
+		}
+		public String getElementAt(int index) {
+			return model.get(index);
+		}
+		public void addToList(String value) {
+			model.add(value);
+			fireIntervalAdded(this, this.getSize() - 1, this.getSize() - 1);
+		}
+	}
+
+
+	
 }

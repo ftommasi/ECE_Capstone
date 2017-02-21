@@ -27,16 +27,20 @@ import edu.slu.iot.realdaq.Sample;
  */
 public class StrandListener extends AWSIotTopic {
 	
+	private StrandWindow sw;
+	
 	private static final Gson gson = new Gson();
 
-    public StrandListener(String topic, AWSIotQos qos) {
+    public StrandListener(String topic, AWSIotQos qos, StrandWindow passedWindow) {
         super(topic, qos);
+        this.sw = passedWindow;
     }
 
     @Override
     public void onMessage(AWSIotMessage message) {
     	Sample sample = gson.fromJson(message.getStringPayload(), Sample.class); 	
         System.out.println(System.currentTimeMillis() + ": <<< " + sample.toString());
+        sw.writeLineToList(sample.toString());
     }
 
 }
