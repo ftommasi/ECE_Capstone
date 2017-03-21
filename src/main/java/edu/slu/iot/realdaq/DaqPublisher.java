@@ -37,7 +37,7 @@ public class DaqPublisher extends Publisher {
           
           float parsedValue = ((float)Integer.parseInt(params[0])*1.8f)/(float)4096;
           long millis = Long.parseLong(params[1]); 
-          
+         /* 
           try{
             Thread.sleep(1000);
           }
@@ -45,6 +45,7 @@ public class DaqPublisher extends Publisher {
             // DO NOTHING 
           }
           
+          */
           Sample s = new Sample(deviceID, sessionID, millis, parsedValue);
           String jsonSample = gson.toJson(s);
           AWSIotMessage message = new NonBlockingPublishListener(topic, qos, jsonSample);
