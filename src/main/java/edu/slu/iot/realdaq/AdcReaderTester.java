@@ -10,10 +10,10 @@ public class AdcReaderTester{
     AdcReader reader = new AdcReader();
     System.out.println("----------------STARTING AdcReader TESTS---------------------");
     for(int i=0; i < 100; i++){
-      double [] samples = reader.read(1,(1.0f));
-      for(double sample : samples){
-        System.out.println(sample);
-      } 
+      //double [] samples = reader.read();
+      //for(double sample : samples){
+       // System.out.println(sample);
+      //} 
     }
   }
 }

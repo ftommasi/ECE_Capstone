@@ -1,13 +1,16 @@
 package edu.slu.iot.realdaq;
 
+
 import com.amazonaws.services.iot.client.AWSIotMessage;
 import com.amazonaws.services.iot.client.AWSIotQos;
 import com.google.gson.Gson;
-
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.Scanner;
-
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 import edu.slu.iot.Publisher;
 
 public class DaqPublisher extends Publisher {
@@ -15,7 +18,9 @@ public class DaqPublisher extends Publisher {
   private String sessionID;
   private String deviceID = "defaultDeviceID";
   private static final Gson gson = new Gson();
-
+  private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
+  private final AdcReader reader = new AdcReader();
+  public AtomicInteger c = new AtomicInteger(0);
   public DaqPublisher(String topic, AWSIotQos qos, String sessionID) {
     super(topic, qos);
     this.sessionID = sessionID;
@@ -23,45 +28,26 @@ public class DaqPublisher extends Publisher {
 
   @Override
   public void run() {
-
-
-    File file = new File("/home/debian/ECE_Capstone_Networking/src/main/c/ECE_Capstone_ADC/SAMPLE-SESSION");
-    try (
-    		Scanner sc = new Scanner(file);
-    ) {
-      while(true){
-        if(sc.hasNextLine()){
-          String value = sc.nextLine();
-
-          String[] params = value.split(" ");
-          
-          float parsedValue = ((float)Integer.parseInt(params[0])*1.8f)/(float)4096;
-          long millis = Long.parseLong(params[1]); 
-         /* 
-          try{
-            Thread.sleep(1000);
-          }
-          catch(InterruptedException e){
-            // DO NOTHING 
-          }
-          
-          */
-          Sample s = new Sample(deviceID, sessionID, millis, parsedValue);
-          String jsonSample = gson.toJson(s);
-          AWSIotMessage message = new NonBlockingPublishListener(topic, qos, jsonSample);
-
-          publish(message);
-        }
-      }
+  scheduler.scheduleAtFixedRate( ()-> {
+    
+    //Sample s = new Sample(deviceID, sessionID, System.nanoTime(), 1.0f);
+     reader.sampleAt(50000,50000.0f);
+    /* 
+    String jsonSample = gson.toJson(s);
+     AWSIotMessage message = new NonBlockingPublishListener(topic, qos, jsonSample);
+     publish(message);
+     */
+     c.incrementAndGet();
+//      System.out.println("INNER: " + c);
+   },0,1,TimeUnit.SECONDS);
+    try{ 
+      Thread.sleep(1000);
+    }
+    catch(InterruptedException e){
+      //NOT HADNLING SHIT
     }
 
-    catch(FileNotFoundException e){
-      System.out.println("could not find file");
-      e.printStackTrace();
-    }
-
-
-
+    System.err.println("FINAL: " + c.intValue());
   }
 
   private class NonBlockingPublishListener extends AWSIotMessage {
@@ -80,6 +66,8 @@ public class DaqPublisher extends Publisher {
 
     @Override
     public void onFailure() {
+
+      System.out.println(this.errorCode + " " + this.errorMessage);
       System.out.println(System.currentTimeMillis() + ": publish failed for " + sample);
     }
 
