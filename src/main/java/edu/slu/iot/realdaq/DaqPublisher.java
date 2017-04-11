@@ -25,21 +25,21 @@ public class DaqPublisher extends Publisher {
     super(topic, qos);
     this.sessionID = sessionID;
   }
-
+  
   @Override
   public void run() {
-  scheduler.scheduleAtFixedRate( ()-> {
+     
+    Process p = Runtime.getRuntime().exec("../../../../../c/ECE_Capstone_ADC/reader");
+      BufferedReader in = 
+        new BufferedReader(new InputStreamReader(p.getInputStream()));
+      
+      while (in.ready()) {
+        //System.out.println(in.readLine());
+        String jsonSample = gson.toJson(s);
+        AWSIotMessage message = new NonBlockingPublishListener(topic, qos, jsonSample);
+        publish(message);
+      }
     
-    //Sample s = new Sample(deviceID, sessionID, System.nanoTime(), 1.0f);
-     reader.sampleAt(50000,50000.0f);
-    /* 
-    String jsonSample = gson.toJson(s);
-     AWSIotMessage message = new NonBlockingPublishListener(topic, qos, jsonSample);
-     publish(message);
-     */
-     c.incrementAndGet();
-//      System.out.println("INNER: " + c);
-   },0,1,TimeUnit.SECONDS);
     try{ 
       Thread.sleep(1000);
     }
