@@ -17,20 +17,30 @@ package edu.slu.iot.client;
 import com.amazonaws.services.iot.client.AWSIotMessage;
 import com.amazonaws.services.iot.client.AWSIotQos;
 import com.amazonaws.services.iot.client.AWSIotTopic;
+import com.google.gson.Gson;
+
+import edu.slu.iot.realdaq.Sample;
 
 /**
  * This class extends {@link AWSIotTopic} to receive messages from a subscribed
  * topic.
  */
 public class StrandListener extends AWSIotTopic {
+	
+	private StrandWindow sw;
+	
+	private static final Gson gson = new Gson();
 
-    public StrandListener(String topic, AWSIotQos qos) {
+    public StrandListener(String topic, AWSIotQos qos, StrandWindow passedWindow) {
         super(topic, qos);
+        this.sw = passedWindow;
     }
 
     @Override
     public void onMessage(AWSIotMessage message) {
-        System.out.println(System.currentTimeMillis() + ": <<< " + message.getStringPayload());
+    	Sample sample = gson.fromJson(message.getStringPayload(), Sample.class); 	
+        System.out.println(System.currentTimeMillis() + ": <<< " + sample.toString());
+        sw.writeLineToList(sample.toString());
     }
 
 }

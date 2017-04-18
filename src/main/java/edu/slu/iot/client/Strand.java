@@ -15,9 +15,9 @@ class Strand {
 	private IoTClient client;
 	
 	public Strand(String topic, File configFile) throws InterruptedException, AWSIotException, AWSIotTimeoutException {
-		configurationFile = configFile;
+		/*configurationFile = configFile;
 		topicString = topic;
 		client = new IoTClient(configurationFile.getPath());
-        client.subscribe(new StrandListener(topicString, AWSIotQos.QOS1));
+        client.subscribe(new StrandListener(topicString, AWSIotQos.QOS1));*/
     }
 }
