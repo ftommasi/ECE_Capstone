@@ -6,4 +6,4 @@ gcc -Wall -o pwm_cap pwm_cap.c -lpruio
 gcc -Wall -o sos sos.c -lpruio
 gcc -Wall -o stepper stepper.c -lpruio
 gcc -Wall -o adc adc.c -lpruio
-gcc -Wall -o reader reader.c -lpruio
+gcc -Wall -o reader reader.c -lpruio -lrt

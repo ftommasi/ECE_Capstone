@@ -7,6 +7,7 @@
 #include <sys/time.h>
 #include "../c_wrapper/pruio.h"
 #include "../c_wrapper/pruio_pins.h"
+#include <time.h>
 
 //! The header pin to use.
 #define PIN P8_07
@@ -149,14 +150,12 @@ int main(int argc, char **argv)
           io->Adc->Value[1] 
           );
       */
-      if(time_elapsed.tv_nsec > 20000){
-       printf("[%d]t: %lu | x: %d\n", 
-          i,
+       printf("%lu:%lu %d\n", 
+          time_elapsed.tv_sec,
           time_elapsed.tv_nsec,
           io->Adc->Value[1] 
           );
           i++;
-      }
       //known constants for output string of ADC. no need for strlen or memcpy when doing this. speed
       time_elapsed.tv_sec =  walltime.tv_sec - prevwalltime.tv_sec;
       time_elapsed.tv_nsec =  walltime.tv_nsec - prevwalltime.tv_nsec;
