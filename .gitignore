@@ -2,4 +2,5 @@
 .project
 .settings
 target
+trash/*
 dependency-reduced-pom.xml
