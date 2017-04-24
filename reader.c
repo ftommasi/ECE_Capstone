@@ -73,7 +73,8 @@ int main(int argc, char **argv)
   signal(SIGINT,sighandler);
   signal(SIGSEGV,sighandler);
   signal(SIGTERM,sighandler);
-  
+  signal(SIGKILL,sighandler);
+
   struct timespec walltime;
   struct timespec prevwalltime;
   struct timespec time_elapsed;
@@ -122,20 +123,26 @@ int main(int argc, char **argv)
     //matching = prevwalltime.tv_nsec; 
 
     while(1) { //                      run loop until keystroke
-      clock_gettime(clock_id,&prevwalltime);
+
+      
+      clock_gettime(CLOCK_REALTIME,&prevwalltime);
+      //      clock_gettime(clock_id,&prevwalltime);
       printf("%lu:%lu %d\n", 
-          prevwalltime.tv_sec,
-          prevwalltime.tv_nsec,
+          
+          //time_elapsed.tv_sec, time_elapsed.tv_nsec,
+          prevwalltime.tv_sec, prevwalltime.tv_nsec,
           io->Adc->Value[1] 
           );
+      fflush(stdout);
       //known constants for output string of ADC. no need for strlen or memcpy when doing this. speed
       //calculate_sleep_time((float)1/atof(argv[1]), &sleep_time,&time_elapsed);
       
       calculate_sleep_time(frequency, &sleep_time,&time_elapsed);
       //printf("[%f]sleeping for %lu:%lu\n",frequency,sleep_time.tv_sec,sleep_time.tv_nsec);
       //TODO makesure that this sleep function doesnt stop the nano clock 
-      nanosleep(&sleep_time,NULL);
-      clock_gettime(clock_id,&walltime);
+      if(nanosleep(&sleep_time,NULL))
+        perror("not enough sleep..\n");
+      clock_gettime(CLOCK_REALTIME,&walltime);
       
       time_elapsed.tv_sec =  walltime.tv_sec - prevwalltime.tv_sec;
       time_elapsed.tv_nsec =  walltime.tv_nsec - prevwalltime.tv_nsec;
