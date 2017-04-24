@@ -5,9 +5,12 @@
 #include <errno.h>
 #include <sys/types.h>
 #include <sys/time.h>
-#include "../c_wrapper/pruio.h"
-#include "../c_wrapper/pruio_pins.h"
+#include "/home/debian/ECE-Capstone-Demo/src/main/c/ECE_Capstone/libpruio-0.2/src/c_wrapper/pruio.h"
+#include "/home/debian/ECE-Capstone-Demo/src/main/c/ECE_Capstone/libpruio-0.2/src/c_wrapper/pruio_pins.h"
 #include <time.h>
+
+
+//"/home/debian/ECE-Capstone-Demo/src/main/c/ECE_Capstone/libpruio-0.2/src/c_examples"
 
 //! The header pin to use.
 #define PIN P8_07
@@ -160,7 +163,9 @@ int main(int argc, char **argv)
       time_elapsed.tv_sec =  walltime.tv_sec - prevwalltime.tv_sec;
       time_elapsed.tv_nsec =  walltime.tv_nsec - prevwalltime.tv_nsec;
       //calculate_sleep_time((float)1/atof(argv[1]), &sleep_time,&time_elapsed);
-      //nanosleep(&sleep_time,NULL);
+      sleep_time.tv_sec = 0;
+      sleep_time.tv_nsec = 20000 - time_elapsed.tv_nsec;
+      nanosleep(&sleep_time,NULL);
       //fflush(STDIN_FILENO);
     }
     tcsetattr(STDIN_FILENO, TCSANOW, &oldt); //           reset terminal
