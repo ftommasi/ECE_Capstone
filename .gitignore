@@ -3,4 +3,5 @@
 .settings
 target
 trash/*
+reader
 dependency-reduced-pom.xml
